@@ -8,27 +8,34 @@ export default function CreatePost() {
   const [preview, setPreview] = useState(null);
 
   const submit = async () => {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    if (image) formData.append("image", image);
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+      if (image) formData.append("image", image);
 
-    const res = await fetch("http://localhost:5000/api/posts", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      },
-      body: formData
-    });
+      const res = await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: formData
+      });
 
-    if (res.ok) {
-      setTitle("");
-      setContent("");
-      setImage(null);
-      setPreview(null);
-      alert("Post created successfully!");
-    } else {
-      alert("Failed to create post");
+      const data = await res.json();
+
+      if (res.ok) {
+        setTitle("");
+        setContent("");
+        setImage(null);
+        setPreview(null);
+        alert("Post created successfully!");
+      } else {
+        alert("Failed to create post: " + data.message);
+      }
+    } catch (error) {
+      console.error("Create post fetch error:", error);
+      alert("Error creating post: " + error.message);
     }
   };
 
@@ -50,15 +57,23 @@ export default function CreatePost() {
       <h1>Create New Post</h1>
       <div className="form-group">
         <label>Title</label>
-        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Post title" />
+        <input
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          placeholder="Post title"
+        />
       </div>
       <div className="form-group">
         <label>Content</label>
-        <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Write your post here..." />
+        <textarea
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          placeholder="Write your post here..."
+        />
       </div>
       <div className="form-group">
         <label>Image</label>
-        <input type="file" accept="image/*" onChange={handleImage} />
+        <input type="file" name="image" accept="image/*" onChange={handleImage} />
         {preview && <img src={preview} alt="preview" className="image-preview" />}
       </div>
       <button onClick={submit} className="btn-submit">Publish Post</button>

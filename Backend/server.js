@@ -2,26 +2,23 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import router from "./ROUTES/auth.js";
+import authRoutes from "./ROUTES/auth.js";
 import postRoutes from "./ROUTES/post.js";
-import './Config/db.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware (in correct order)
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("Uploads"));
 
 // Routes
-app.use('/api/admin', router);
-app.use('/api/posts', postRoutes);
+app.use("/api/admin", authRoutes);  // admin auth routes
+app.use("/api/posts", postRoutes);  // posts routes
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

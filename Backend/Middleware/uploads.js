@@ -1,13 +1,15 @@
 import multer from "multer";
-import path from "path";  // ✅ ESM import
+import path from "path";
 
+// Store uploads in 'Uploads/' folder
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
+  destination: (req, file, cb) => {
+    cb(null, "Uploads/");
   },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + "-" + Date.now() + ext);
+  }
 });
 
 export const uploads = multer({ storage });
