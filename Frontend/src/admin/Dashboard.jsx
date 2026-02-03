@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
+import api from "../utility/api";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
@@ -8,9 +9,9 @@ export default function Dashboard() {
   const admin = JSON.parse(localStorage.getItem("admin"));
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/posts")
-      .then(res => res.json())
-      .then(data => setPosts(data.posts || []));
+    api.get("/posts")
+      .then(res => setPosts(res.data.posts || []))
+      .catch(err => console.error("Error fetching posts:", err));
   }, []);
 
   return (
@@ -54,7 +55,7 @@ export default function Dashboard() {
           {posts.slice(0, 8).map(post => (
             <div key={post.id} className="post-card">
               {post.image ? (
-                <img src={`http://localhost:5000/uploads/${post.image}`} alt={post.title} className="post-img" />
+                <img src={`https://my-blog-yuoq.onrender.com/uploads/${post.image}`} alt={post.title} className="post-img" />
               ) : (
                 <div className="post-img placeholder">No Image</div>
               )}
@@ -62,7 +63,7 @@ export default function Dashboard() {
                 <h4>{post.title}</h4>
                 <p>{post.content?.slice(0, 100)}...</p>
                 <span className={`status-badge ${post.status}`}>{post.status}</span>
-                <button onClick={() => navigate(`/admin/posts`)} className="btn-edit-post">
+                <button onClick={() => navigate(`/admin/posts/${post.id}`)} className="btn-edit-post">
                   Manage
                 </button>
               </div>
